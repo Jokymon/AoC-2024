@@ -1,0 +1,25 @@
+[[bin]]
+name = "new_day"
+path = "src/tools/new_day.rs"
+
+[[bin]]
+name = "day1"
+path = "src/day1/day1.rs"
+
+[[bin]]
+name = "day2"
+path = "src/day2/day2.rs"
+
+[[bin]]
+name = "day3"
+path = "src/day3/day3.rs"
+
+[dependencies]
+itertools = "0.13.0"
+regex = "1.11.1"
+toml = "0.8.19"
+
+[package]
+edition = "2021"
+name = "aoc2024"
+version = "0.1.0"
