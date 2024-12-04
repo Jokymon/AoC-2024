@@ -19,7 +19,7 @@ mod tests{
 
     #[test]
     fn test_simple_input_part1() {
-        assert_eq!(challenge(SIMPLE_INPUT), 0);
+        assert_eq!(challenge1(SIMPLE_INPUT), 0);
     }
 
     #[test]
@@ -28,7 +28,7 @@ mod tests{
     }
 }
 
-fn challenge(challenge_input: &str) -> i32 {
+fn challenge1(challenge_input: &str) -> i32 {
     42
 }
 
@@ -39,10 +39,10 @@ fn challenge2(challenge_input: &str) -> i32 {
 fn main() -> Result<(), Box<dyn Error>> {
     let test_input = read_to_string("input_data/{day_name}/input.txt")?;
 
-    let result = challenge(&test_input);
+    let result1 = challenge1(&test_input);
     let result2 = challenge2(&test_input);
 
-    println!("Answer part 1: {}", result);
+    println!("Answer part 1: {}", result1);
     println!("Answer part 2: {}", result2);
 
     Ok(())
@@ -54,10 +54,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let rust_file_name = day_name.to_string() + ".rs";
 
-    let new_dir = format!("src/{}", &day_name);
-    fs::create_dir_all(&new_dir)?;
+    let new_data_dir = format!("input_data/{}", &day_name);
+    fs::create_dir_all(&new_data_dir)?;
+    let new_src_dir = format!("src/{}", &day_name);
+    fs::create_dir_all(&new_src_dir)?;
     fs::write(
-        Path::new(&new_dir).join(&rust_file_name),
+        Path::new(&new_src_dir).join(&rust_file_name),
         RUST_TEMPLATE.replace("{day_name}", &day_name),
     )
     .expect("Couldn't write to output file");
