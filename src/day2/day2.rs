@@ -72,24 +72,19 @@ fn rating_from_readings(readings: &[i32]) -> Rating {
 }
 
 fn challenge(challenge_input: &str) -> i32 {
-    let mut safe_counter = 0;
-
-    for line in challenge_input.split('\n') {
+    let safe_counter = challenge_input
+        .split('\n')
+        .filter(|line| {
         let readings: Vec<i32> = line
             .split_whitespace()
             .map(|x| x.parse::<i32>().unwrap())
             .collect();
 
-        let Rating {
-            is_safe,
-            failure_index: _,
-        } = rating_from_readings(&readings);
+            rating_from_readings(&readings).is_safe
+        })
+        .count();
 
-        if is_safe {
-            safe_counter += 1;
-        }
-    }
-    safe_counter
+    safe_counter as i32
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
