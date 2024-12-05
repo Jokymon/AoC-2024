@@ -1,3 +1,4 @@
+use aoc2024::SimpleParse;
 use std::error::Error;
 use std::fs::read_to_string;
 
@@ -75,10 +76,7 @@ fn challenge(challenge_input: &str) -> i32 {
     let safe_counter = challenge_input
         .split('\n')
         .filter(|line| {
-        let readings: Vec<i32> = line
-            .split_whitespace()
-            .map(|x| x.parse::<i32>().unwrap())
-            .collect();
+            let readings: Vec<i32> = line.split_whitespace().map(|x| x.get_i32()).collect();
 
             rating_from_readings(&readings).is_safe
         })
@@ -91,10 +89,7 @@ fn challenge2(challenge_input: &str) -> i32 {
     let mut safe_counter = 0;
 
     for line in challenge_input.split('\n') {
-        let readings: Vec<i32> = line
-            .split_whitespace()
-            .map(|x| x.parse::<i32>().unwrap())
-            .collect();
+        let readings: Vec<i32> = line.split_whitespace().map(|x| x.get_i32()).collect();
 
         let Rating {
             is_safe,

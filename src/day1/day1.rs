@@ -1,3 +1,4 @@
+use aoc2024::SimpleParse;
 use itertools::Itertools;
 use std::error::Error;
 use std::fs::read_to_string;
@@ -26,10 +27,7 @@ mod tests {
 
 fn str_to_tuple(s: &str) -> (i32, i32) {
     let mut it = s.split_whitespace();
-    (
-        it.next().unwrap().parse::<i32>().unwrap(),
-        it.next().unwrap().parse::<i32>().unwrap(),
-    )
+    (it.next().unwrap().get_i32(), it.next().unwrap().get_i32())
 }
 
 fn challenge(challenge_input: &str) -> i32 {

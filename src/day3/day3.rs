@@ -1,3 +1,4 @@
+use aoc2024::SimpleParse;
 use regex::Regex;
 use std::error::Error;
 use std::fs::read_to_string;
@@ -28,8 +29,8 @@ fn challenge(challenge_input: &str) -> i32 {
         .captures_iter(challenge_input)
         .map(|cap| {
             let (_, [left, right]) = cap.extract();
-            let left_num = left.parse::<i32>().unwrap();
-            let right_num = right.parse::<i32>().unwrap();
+            let left_num = left.get_i32();
+            let right_num = right.get_i32();
             left_num * right_num
         })
         .sum();
@@ -50,8 +51,8 @@ fn challenge2(challenge_input: &str) -> i32 {
                 "don't" => (false, 0),
                 "mul" => {
                     if is_enabled {
-                        let left = caps.name("left").unwrap().as_str().parse::<i32>().unwrap();
-                        let right = caps.name("right").unwrap().as_str().parse::<i32>().unwrap();
+                        let left = caps.name("left").unwrap().as_str().get_i32();
+                        let right = caps.name("right").unwrap().as_str().get_i32();
                         (true, left * right)
                     } else {
                         (false, 0)

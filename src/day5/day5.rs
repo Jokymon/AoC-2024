@@ -1,3 +1,4 @@
+use aoc2024::SimpleParse;
 use std::cmp::Ordering;
 use std::error::Error;
 use std::fs::read_to_string;
@@ -101,16 +102,14 @@ fn parse_input(challenge_input: &str) -> ChallengeInput {
             }
             let mut line_parser = line.split('|');
             let (left, right) = (line_parser.next().unwrap(), line_parser.next().unwrap());
-            result
-                .rules
-                .push((left.parse::<i32>().unwrap(), right.parse::<i32>().unwrap()));
+            result.rules.push((left.get_i32(), right.get_i32()));
         } else {
             if line.trim() == "" {
                 continue;
             }
             result
                 .updates
-                .push(line.split(',').map(|x| x.parse::<i32>().unwrap()).collect());
+                .push(line.split(',').map(|x| x.get_i32()).collect());
         }
     }
 
@@ -133,8 +132,7 @@ fn challenge1(challenge_input: &str) -> i32 {
 fn challenge2(challenge_input: &str) -> i32 {
     let input = parse_input(challenge_input);
 
-    let sum = 
-    input.updates.iter().fold(0, |accu, page_update| {
+    let sum = input.updates.iter().fold(0, |accu, page_update| {
         if !update_satisfies_rules(&page_update, &input.rules) {
             let mut fixed_update = page_update.clone();
 
@@ -149,7 +147,10 @@ fn challenge2(challenge_input: &str) -> i32 {
             });
 
             accu + fixed_update.get(fixed_update.len() / 2).unwrap()
-    } else { accu }});
+        } else {
+            accu
+        }
+    });
 
     sum
 }

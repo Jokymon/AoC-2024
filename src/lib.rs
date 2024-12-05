@@ -29,3 +29,13 @@ pub fn get_arg1() -> Option<String> {
     let args: Vec<String> = env::args().collect();
     args.get(1).cloned()
 }
+
+pub trait SimpleParse {
+    fn get_i32(&self) -> i32;
+}
+
+impl SimpleParse for &str {
+    fn get_i32(&self) -> i32 {
+        self.parse::<i32>().unwrap()
+    }
+}
