@@ -25,23 +25,20 @@ mod tests {
 
 fn challenge(challenge_input: &str) -> i32 {
     let re = Regex::new(r"mul\(([0-9]+),([0-9]+)\)").unwrap();
-    let sum = re
-        .captures_iter(challenge_input)
+    re.captures_iter(challenge_input)
         .map(|cap| {
             let (_, [left, right]) = cap.extract();
             let left_num = left.get_i32();
             let right_num = right.get_i32();
             left_num * right_num
         })
-        .sum();
-    sum
+        .sum()
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
     let re = Regex::new(r"(?<op>mul|do|don't)\(((?<left>[0-9]+),(?<right>[0-9]+))?\)").unwrap();
     let mut is_enabled = true;
-    let sum = re
-        .captures_iter(challenge_input)
+    re.captures_iter(challenge_input)
         .map(|caps| {
             let op = caps.name("op").unwrap().as_str();
 
@@ -62,8 +59,7 @@ fn challenge2(challenge_input: &str) -> i32 {
             };
             val
         })
-        .sum();
-    sum
+        .sum()
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
