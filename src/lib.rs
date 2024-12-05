@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::error::Error;
 use std::{env, fmt};
 
@@ -32,11 +33,20 @@ pub fn get_arg1() -> Option<String> {
 
 pub trait SimpleParse {
     fn get_i32(&self) -> i32;
+    fn to_pair(&self) -> (i32, i32);
 }
 
 impl SimpleParse for &str {
     fn get_i32(&self) -> i32 {
         self.parse::<i32>().unwrap()
+    }
+
+    fn to_pair(&self) -> (i32, i32) {
+        self.split_whitespace()
+            .take(2)
+            .map(|x| x.get_i32())
+            .collect_tuple()
+            .unwrap()
     }
 }
 

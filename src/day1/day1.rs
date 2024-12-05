@@ -25,13 +25,8 @@ mod tests {
     }
 }
 
-fn str_to_tuple(s: &str) -> (i32, i32) {
-    let mut it = s.split_whitespace();
-    (it.next().unwrap().get_i32(), it.next().unwrap().get_i32())
-}
-
 fn challenge(challenge_input: &str) -> i32 {
-    let l: Vec<(i32, i32)> = challenge_input.lines().map(str_to_tuple).collect();
+    let l: Vec<(i32, i32)> = challenge_input.lines().map(|l| l.to_pair()).collect();
     let (mut left, mut right): (Vec<i32>, Vec<i32>) = l.into_iter().unzip();
     left.sort();
     right.sort();
@@ -40,7 +35,7 @@ fn challenge(challenge_input: &str) -> i32 {
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
-    let l: Vec<(i32, i32)> = challenge_input.lines().map(str_to_tuple).collect();
+    let l: Vec<(i32, i32)> = challenge_input.lines().map(|l| l.to_pair()).collect();
     let (mut left, mut right): (Vec<i32>, Vec<i32>) = l.into_iter().unzip();
     left.sort();
     right.sort();
