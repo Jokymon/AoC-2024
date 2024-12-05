@@ -39,3 +39,19 @@ impl SimpleParse for &str {
         self.parse::<i32>().unwrap()
     }
 }
+
+pub trait CharacterField {
+    fn char_at(&self, x: i32, y: i32) -> Option<char>;
+}
+
+impl CharacterField for Vec<&str> {
+    fn char_at(&self, x: i32, y: i32) -> Option<char> {
+        if (y < 0) || (y as usize >= self.len()) {
+            return None;
+        }
+        if (x < 0) || (x as usize >= self[y as usize].len()) {
+            return None;
+        }
+        Some(self[y as usize].as_bytes()[x as usize] as char)
+    }
+}

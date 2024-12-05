@@ -1,3 +1,4 @@
+use aoc2024::CharacterField;
 use std::error::Error;
 use std::fs::read_to_string;
 
@@ -16,6 +17,17 @@ SAXAMASAAA
 MAMMMXMMMM
 MXMXAXMASX"#;
 
+    const SIMPLE_INPUT2: &str = r#".M.S......
+..A..MSMS.
+.M.S.MAA..
+..A.ASMSM.
+.M.S.M....
+..........
+S.S.S.S.S.
+.A.A.A.A..
+M.M.M.M.M.
+.........."#;
+
     #[test]
     fn test_simple_input_part1() {
         assert_eq!(challenge1(SIMPLE_INPUT), 18);
@@ -23,7 +35,7 @@ MXMXAXMASX"#;
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT2), 9);
     }
 
     #[test]
@@ -153,7 +165,28 @@ fn challenge1(challenge_input: &str) -> i32 {
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
-    42
+    let char_field: Vec<&str> = challenge_input.lines().collect();
+
+    let mut mas_count = 0;
+    for x in 0..char_field[0].len() as i32 {
+        for y in 0..char_field.len() as i32 {
+            if char_field.char_at(x, y).unwrap_or('.') == 'A' {
+                let corners: Vec<char> = vec![(-1, -1), (1, 1), (-1, 1), (1, -1)]
+                    .iter()
+                    .map(|(dx, dy)| char_field.char_at(x + dx, y + dy).unwrap_or('.'))
+                    .collect();
+
+                if ((corners[0] == 'M' && corners[1] == 'S')
+                    || (corners[0] == 'S' && corners[1] == 'M'))
+                    && ((corners[2] == 'M' && corners[3] == 'S')
+                        || (corners[2] == 'S' && corners[3] == 'M'))
+                {
+                    mas_count += 1;
+                }
+            }
+        }
+    }
+    mas_count
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
