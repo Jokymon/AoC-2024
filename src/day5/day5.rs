@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::error::Error;
 use std::fs::read_to_string;
 
@@ -41,7 +42,7 @@ mod tests {
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT), 123);
     }
 
     #[test]
@@ -61,18 +62,12 @@ mod tests {
     }
 }
 
-#[derive(PartialEq)]
-enum ParsingMode {
-    Rules,
-    PageUpdates,
-}
-
 fn update_satisfies_rules(update: &Vec<i32>, rules: &Vec<(i32, i32)>) -> bool {
     for first_index in 0..update.len() {
-        for second_index in first_index+1..update.len() {
+        for second_index in first_index + 1..update.len() {
             // If the reversed order of the numbers is member of the rules,
             // then they violate the rules
-            if rules.contains( &(update[second_index], update[first_index]) ) {
+            if rules.contains(&(update[second_index], update[first_index])) {
                 return false;
             }
         }
@@ -80,11 +75,24 @@ fn update_satisfies_rules(update: &Vec<i32>, rules: &Vec<(i32, i32)>) -> bool {
     true
 }
 
-fn challenge1(challenge_input: &str) -> i32 {
-    let mut sum = 0;
-    let mut rules: Vec<(i32, i32)> = vec![];
+#[derive(PartialEq)]
+enum ParsingMode {
+    Rules,
+    PageUpdates,
+}
 
+struct ChallengeInput {
+    rules: Vec<(i32, i32)>,
+    updates: Vec<Vec<i32>>,
+}
+
+fn parse_input(challenge_input: &str) -> ChallengeInput {
     let mut parsing_mode = ParsingMode::Rules;
+    let mut result = ChallengeInput {
+        rules: vec![],
+        updates: vec![],
+    };
+
     for line in challenge_input.split('\n') {
         if parsing_mode == ParsingMode::Rules {
             if line.trim() == "" {
@@ -93,22 +101,57 @@ fn challenge1(challenge_input: &str) -> i32 {
             }
             let mut line_parser = line.split('|');
             let (left, right) = (line_parser.next().unwrap(), line_parser.next().unwrap());
-            rules.push( (left.parse::<i32>().unwrap(), right.parse::<i32>().unwrap()));
+            result
+                .rules
+                .push((left.parse::<i32>().unwrap(), right.parse::<i32>().unwrap()));
         } else {
             if line.trim() == "" {
                 continue;
             }
-            let page_update: Vec<i32> = line.split(',').map(|x| x.parse::<i32>().unwrap()).collect();
-            if update_satisfies_rules(&page_update, &rules) {
-                sum += page_update.get(page_update.len() / 2).unwrap();
-            }
+            result
+                .updates
+                .push(line.split(',').map(|x| x.parse::<i32>().unwrap()).collect());
         }
     }
+
+    result
+}
+
+fn challenge1(challenge_input: &str) -> i32 {
+    let input = parse_input(challenge_input);
+
+    let sum = input
+        .updates
+        .iter()
+        .filter(|update| update_satisfies_rules(&update, &input.rules))
+        .map(|update| update.get(update.len() / 2).unwrap())
+        .sum();
+
     sum
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
-    42
+    let input = parse_input(challenge_input);
+
+    let sum = 
+    input.updates.iter().fold(0, |accu, page_update| {
+        if !update_satisfies_rules(&page_update, &input.rules) {
+            let mut fixed_update = page_update.clone();
+
+            fixed_update.sort_by(|&x, &y| {
+                if input.rules.contains(&(x, y)) {
+                    Ordering::Less
+                } else if input.rules.contains(&(y, x)) {
+                    Ordering::Greater
+                } else {
+                    Ordering::Equal
+                }
+            });
+
+            accu + fixed_update.get(fixed_update.len() / 2).unwrap()
+    } else { accu }});
+
+    sum
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
