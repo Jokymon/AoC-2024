@@ -65,7 +65,10 @@ fn rating_from_readings(readings: &[i32]) -> Rating {
             break;
         }
     }
-    Rating{is_safe, failure_index}
+    Rating {
+        is_safe,
+        failure_index,
+    }
 }
 
 fn challenge(challenge_input: &str) -> i32 {
@@ -77,7 +80,10 @@ fn challenge(challenge_input: &str) -> i32 {
             .map(|x| x.parse::<i32>().unwrap())
             .collect();
 
-        let Rating{is_safe, failure_index: _} = rating_from_readings(&readings);
+        let Rating {
+            is_safe,
+            failure_index: _,
+        } = rating_from_readings(&readings);
 
         if is_safe {
             safe_counter += 1;
@@ -95,30 +101,34 @@ fn challenge2(challenge_input: &str) -> i32 {
             .map(|x| x.parse::<i32>().unwrap())
             .collect();
 
-        let Rating{is_safe, failure_index} = rating_from_readings(&readings);
+        let Rating {
+            is_safe,
+            failure_index,
+        } = rating_from_readings(&readings);
 
         if is_safe {
             safe_counter += 1;
         } else {
-            let mut dampened_readings = readings.to_vec();
-            dampened_readings.remove(failure_index);
-            let Rating{is_safe: is_safe2, failure_index: _} = rating_from_readings(&dampened_readings);
-            if is_safe2 {
-                safe_counter += 1;
-            } else if failure_index + 1 < readings.len() {
-                let mut dampened_readings2 = readings.to_vec();
-                dampened_readings2.remove(failure_index + 1);
-                let Rating{is_safe: is_safe3, failure_index: _} = rating_from_readings(&dampened_readings2);
-                if is_safe3 {
+            let lower_bound = if failure_index == 0 {
+                0
+            } else {
+                failure_index - 1
+            };
+            for remove_index in lower_bound..(failure_index + 2) {
+                if remove_index >= readings.len() {
+                    continue;
+                }
+
+                let mut dampened_readings = readings.to_vec();
+                dampened_readings.remove(remove_index);
+
+                let Rating {
+                    is_safe: is_safe2,
+                    failure_index: _,
+                } = rating_from_readings(&dampened_readings);
+                if is_safe2 {
                     safe_counter += 1;
-                } else {
-                    // Maybe the first element was the problem?
-                    let mut dampened_readings3 = readings.to_vec();
-                    dampened_readings3.remove(0);
-                    let Rating{is_safe: is_safe4, failure_index: _} = rating_from_readings(&dampened_readings3);
-                    if is_safe4 {
-                        safe_counter += 1;
-                    }
+                    break;
                 }
             }
         }
