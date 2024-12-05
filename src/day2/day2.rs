@@ -74,7 +74,7 @@ fn rating_from_readings(readings: &[i32]) -> Rating {
 
 fn challenge(challenge_input: &str) -> i32 {
     let safe_counter = challenge_input
-        .split('\n')
+        .lines()
         .filter(|line| {
             let readings: Vec<i32> = line.split_whitespace().map(|x| x.get_i32()).collect();
 
@@ -88,7 +88,7 @@ fn challenge(challenge_input: &str) -> i32 {
 fn challenge2(challenge_input: &str) -> i32 {
     let mut safe_counter = 0;
 
-    for line in challenge_input.split('\n') {
+    for line in challenge_input.lines() {
         let readings: Vec<i32> = line.split_whitespace().map(|x| x.get_i32()).collect();
 
         let Rating {

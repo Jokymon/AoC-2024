@@ -94,7 +94,7 @@ fn parse_input(challenge_input: &str) -> ChallengeInput {
         updates: vec![],
     };
 
-    for line in challenge_input.split('\n') {
+    for line in challenge_input.lines() {
         if parsing_mode == ParsingMode::Rules {
             if line.trim() == "" {
                 parsing_mode = ParsingMode::PageUpdates;

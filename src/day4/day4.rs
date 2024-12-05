@@ -56,7 +56,7 @@ MXMXAXMASX"#;
 
 fn get_main_diagonals(text: &str) -> Vec<String> {
     let lines: Vec<String> = text
-        .split("\n")
+        .lines()
         .filter(|line| line.trim() != "")
         .map(|x| x.to_string())
         .collect();
@@ -79,7 +79,7 @@ fn get_main_diagonals(text: &str) -> Vec<String> {
 
 fn get_cross_diagonals(text: &str) -> Vec<String> {
     let lines: Vec<String> = text
-        .split("\n")
+        .lines()
         .filter(|line| line.trim() != "")
         .map(|x| x.to_string())
         .collect();
@@ -103,7 +103,7 @@ fn get_cross_diagonals(text: &str) -> Vec<String> {
 
 fn get_transposed(text: &str) -> Vec<String> {
     let lines: Vec<String> = text
-        .split("\n")
+        .lines()
         .filter(|line| line.trim() != "")
         .map(|x| x.to_string())
         .collect();
@@ -126,7 +126,7 @@ fn get_transposed(text: &str) -> Vec<String> {
 
 fn challenge1(challenge_input: &str) -> i32 {
     let mut hits: usize = challenge_input
-        .split('\n')
+        .lines()
         .filter(|line| line.trim() != "")
         .map(|line| line.matches("XMAS").count() + line.matches("SAMX").count())
         .sum();
