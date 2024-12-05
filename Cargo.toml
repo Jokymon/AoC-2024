@@ -18,6 +18,11 @@ path = "src/day3/day3.rs"
 name = "day4"
 path = "src/day4/day4.rs"
 
+[[bin]]
+name = "day5"
+path = "src/day5/day5.rs"
+
+
 [dependencies]
 itertools = "0.13.0"
 regex = "1.11.1"
