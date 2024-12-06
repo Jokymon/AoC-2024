@@ -36,7 +36,7 @@ pub trait SimpleParse {
     fn to_pair(&self) -> (i32, i32);
 }
 
-impl SimpleParse for &str {
+impl SimpleParse for str {
     fn get_i32(&self) -> i32 {
         self.parse::<i32>().unwrap()
     }
@@ -52,6 +52,8 @@ impl SimpleParse for &str {
 
 pub trait CharacterField {
     fn char_at(&self, x: i32, y: i32) -> Option<char>;
+
+    fn with_char_at(&self, x: i32, y: i32, new_ch: char) -> Vec<String>;
 }
 
 impl CharacterField for Vec<&str> {
@@ -63,5 +65,21 @@ impl CharacterField for Vec<&str> {
             return None;
         }
         Some(self[y as usize].as_bytes()[x as usize] as char)
+    }
+
+    fn with_char_at(&self, x: i32, y: i32, new_ch: char) -> Vec<String> {
+        self.iter()
+            .enumerate()
+            .map(|(row, line)| {
+                if row as i32 == y {
+                    line.chars()
+                        .enumerate()
+                        .map(|(column, ch)| if column as i32 == x { new_ch } else { ch })
+                        .collect()
+                } else {
+                    line.to_string()
+                }
+            })
+            .collect()
     }
 }

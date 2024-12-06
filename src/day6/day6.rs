@@ -1,4 +1,5 @@
 use aoc2024::CharacterField;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::read_to_string;
 
@@ -24,11 +25,22 @@ mod tests {
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT), 6);
+    }
+
+    #[test]
+    fn test_walking_produces_a_loop() {
+        let new_maze = SIMPLE_INPUT
+            .lines()
+            .collect::<Vec<_>>()
+            .with_char_at(3, 6, '#');
+
+        let modified_input = new_maze.join("\n");
+        assert_eq!(walk_the_maze(&modified_input), Walk::Loop);
     }
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Position {
     row: i32,
     column: i32,
@@ -93,8 +105,16 @@ fn look_ahead(maze: &Vec<&str>, position: Position, direction: Direction) -> cha
     maze.char_at(look_at.column, look_at.row).unwrap_or('%')
 }
 
-fn walk_the_maze(input: &str) -> i32 {
-    let mut visited_places: Vec<Position> = vec![];
+#[derive(PartialEq, Debug, Copy, Clone)]
+enum Walk {
+    Distance(i32),
+    Loop,
+}
+
+fn walk_the_maze(input: &str) -> Walk {
+    // let mut visited_places: Vec<Position> = vec![];
+    // Late understanding: We need UNIQUE places
+    let mut visited_places: HashMap<Position, Direction> = HashMap::new();
     let mut state = Direction::Up;
     let mut position = find_start_position(input);
 
@@ -108,9 +128,12 @@ fn walk_the_maze(input: &str) -> i32 {
             }
             // Somehow thought about ^ but then forgot about it again
             '.' | '^' => {
-                // Late understanding: We need UNIQUE places
-                if !visited_places.contains(&position) {
-                    visited_places.push(position);
+                if let Some(direction) = visited_places.get(&position) {
+                    if *direction == state {
+                        return Walk::Loop;
+                    }
+                } else {
+                    visited_places.insert(position, state);
                 }
                 position = position_ahead(position, state);
             }
@@ -119,15 +142,30 @@ fn walk_the_maze(input: &str) -> i32 {
         ahead_of_guard = look_ahead(&maze, position, state);
     }
     // TODO: Need to think about this off by one issue
-    visited_places.len() as i32 + 1
+    Walk::Distance(visited_places.len() as i32 + 1)
 }
 
 fn challenge1(challenge_input: &str) -> i32 {
-    walk_the_maze(challenge_input)
+    match walk_the_maze(challenge_input) {
+        Walk::Distance(d) => d,
+        Walk::Loop => panic!("Challenge 1 shouldn't have any loops"),
+    }
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
-    42
+    let mut possibilites = 0;
+    let maze = challenge_input.lines().collect::<Vec<_>>();
+
+    for row in 0..maze.len() {
+        for column in 0..maze[0].len() {
+            let new_maze = maze.with_char_at(column as i32, row as i32, '#');
+            let new_input = new_maze.join("\n");
+            if walk_the_maze(&new_input) == Walk::Loop {
+                possibilites += 1;
+            }
+        }
+    }
+    possibilites
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
