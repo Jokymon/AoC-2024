@@ -6,15 +6,14 @@ use std::io::Write;
 use std::path::Path;
 use toml::Table;
 
-const RUST_TEMPLATE: &str = r##"
-use std::error::Error;
+const RUST_TEMPLATE: &str = r##"use std::error::Error;
 use std::fs::read_to_string;
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::*;
 
-    const SIMPLE_INPUT : &str = r#"
+    const SIMPLE_INPUT: &str = r#"
     "#;
 
     #[test]
@@ -28,11 +27,11 @@ mod tests{
     }
 }
 
-fn challenge1(challenge_input: &str) -> i32 {
+fn challenge1(_challenge_input: &str) -> i32 {
     42
 }
 
-fn challenge2(challenge_input: &str) -> i32 {
+fn challenge2(_challenge_input: &str) -> i32 {
     42
 }
 
