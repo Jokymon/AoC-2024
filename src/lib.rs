@@ -52,6 +52,7 @@ impl SimpleParse for str {
 
 pub trait CharacterField {
     fn char_at(&self, x: i32, y: i32) -> Option<char>;
+    fn has_position(&self, x: i32, y: i32) -> bool;
 
     fn with_char_at(&self, x: i32, y: i32, new_ch: char) -> Vec<String>;
 }
@@ -65,6 +66,10 @@ impl CharacterField for Vec<&str> {
             return None;
         }
         Some(self[y as usize].as_bytes()[x as usize] as char)
+    }
+
+    fn has_position(&self, x: i32, y: i32) -> bool {
+        (x >= 0) && (x < self[0].len() as i32) && (y >= 0) && (y < self.len() as i32)
     }
 
     fn with_char_at(&self, x: i32, y: i32, new_ch: char) -> Vec<String> {

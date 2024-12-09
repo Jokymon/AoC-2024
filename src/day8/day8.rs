@@ -1,5 +1,9 @@
+use aoc2024::CharacterField;
+use itertools::Itertools;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fs::read_to_string;
+use std::ops::{Add, Sub};
 
 #[cfg(test)]
 mod tests {
@@ -20,7 +24,7 @@ mod tests {
 
     #[test]
     fn test_simple_input_part1() {
-        assert_eq!(challenge1(SIMPLE_INPUT), 0);
+        assert_eq!(challenge1(SIMPLE_INPUT), 14);
     }
 
     #[test]
@@ -29,8 +33,78 @@ mod tests {
     }
 }
 
-fn challenge1(_challenge_input: &str) -> i32 {
-    42
+#[derive(Debug, Clone, Copy, PartialEq)]
+struct Position {
+    x: i32,
+    y: i32,
+}
+
+impl Add for Position {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Position {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl Sub for Position {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        Position {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
+fn challenge1(challenge_input: &str) -> i32 {
+    let mut antennas: HashMap<char, Vec<Position>> = HashMap::new();
+
+    let antenna_map: Vec<_> = challenge_input.lines().collect();
+
+    // Get all antennas from the map
+    antenna_map.iter().enumerate().for_each(|(line_no, line)| {
+        line.chars().enumerate().for_each(|(char_no, antenna)| {
+            if antenna != '.' {
+                if !antennas.contains_key(&antenna) {
+                    antennas.insert(antenna, vec![]);
+                }
+
+                antennas.get_mut(&antenna).unwrap().push(Position {
+                    x: char_no as i32,
+                    y: line_no as i32,
+                });
+            }
+        });
+    });
+
+    // Calculate the positions of the antinodes per antenna type
+    let mut antinodes: Vec<Position> = Vec::new();
+    antennas.iter().for_each(|(_antenna, positions)| {
+        positions.into_iter().combinations(2).for_each(|pair| {
+            let position1 = pair.first().unwrap();
+            let position2 = pair.last().unwrap();
+
+            let distance_vector = **position2 - **position1;
+            let antinode1 = **position1 - distance_vector;
+            if antenna_map.has_position(antinode1.x, antinode1.y) {
+                if !antinodes.contains(&antinode1) {
+                    antinodes.push(antinode1);
+                }
+            }
+            let antinode2 = **position2 + distance_vector;
+            if antenna_map.has_position(antinode2.x, antinode2.y) {
+                if !antinodes.contains(&antinode2) {
+                    antinodes.push(antinode2);
+                }
+            }
+        });
+    });
+
+    antinodes.iter().count() as i32
 }
 
 fn challenge2(_challenge_input: &str) -> i32 {
