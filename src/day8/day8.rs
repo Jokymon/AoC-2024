@@ -29,7 +29,7 @@ mod tests {
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT), 34);
     }
 }
 
@@ -107,8 +107,65 @@ fn challenge1(challenge_input: &str) -> i32 {
     antinodes.iter().count() as i32
 }
 
-fn challenge2(_challenge_input: &str) -> i32 {
-    42
+fn challenge2(challenge_input: &str) -> i32 {
+    let mut antennas: HashMap<char, Vec<Position>> = HashMap::new();
+
+    let antenna_map: Vec<_> = challenge_input.lines().collect();
+
+    // Get all antennas from the map
+    antenna_map.iter().enumerate().for_each(|(line_no, line)| {
+        line.chars().enumerate().for_each(|(char_no, antenna)| {
+            if antenna != '.' {
+                if !antennas.contains_key(&antenna) {
+                    antennas.insert(antenna, vec![]);
+                }
+
+                antennas.get_mut(&antenna).unwrap().push(Position {
+                    x: char_no as i32,
+                    y: line_no as i32,
+                });
+            }
+        });
+    });
+
+    // Calculate the positions of the antinodes per antenna type
+    let mut antinodes: Vec<Position> = Vec::new();
+    antennas.iter().for_each(|(_antenna, positions)| {
+        positions.into_iter().combinations(2).for_each(|pair| {
+            // The &&Position type here is not entirely clear to me, maybe this can be simplified?
+            let position1 = pair.first().unwrap();
+            let position2 = pair.last().unwrap();
+
+            // Addition 1 for getting part 2 to work
+            if !antinodes.contains(position1) {
+                antinodes.push(**position1);
+            }
+            if !antinodes.contains(&position2) {
+                antinodes.push(**position2);
+            }
+
+            let distance_vector = **position2 - **position1;
+
+            let mut antinode1 = **position1 - distance_vector;
+            // The addition 2 to get part 2 to work was just turning the `if` into a while and
+            // adding/subtracting the `distance_vector` over and over again
+            while antenna_map.has_position(antinode1.x, antinode1.y) {
+                if !antinodes.contains(&antinode1) {
+                    antinodes.push(antinode1);
+                }
+                antinode1 = antinode1 - distance_vector;
+            }
+            let mut antinode2 = **position2 + distance_vector;
+            while antenna_map.has_position(antinode2.x, antinode2.y) {
+                if !antinodes.contains(&antinode2) {
+                    antinodes.push(antinode2);
+                }
+                antinode2 = antinode2 + distance_vector;
+            }
+        });
+    });
+
+    antinodes.iter().count() as i32
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
