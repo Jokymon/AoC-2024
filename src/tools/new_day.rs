@@ -27,11 +27,11 @@ mod tests {
     }
 }
 
-fn challenge1(_challenge_input: &str) -> i32 {
+fn challenge1(_challenge_input: &str) -> i64 {
     42
 }
 
-fn challenge2(_challenge_input: &str) -> i32 {
+fn challenge2(_challenge_input: &str) -> i64 {
     42
 }
 
