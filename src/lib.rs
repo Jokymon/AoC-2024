@@ -33,12 +33,17 @@ pub fn get_arg1() -> Option<String> {
 
 pub trait SimpleParse {
     fn get_i32(&self) -> i32;
+    fn get_i64(&self) -> i64;
     fn to_pair(&self) -> (i32, i32);
 }
 
 impl SimpleParse for str {
     fn get_i32(&self) -> i32 {
         self.parse::<i32>().unwrap()
+    }
+
+    fn get_i64(&self) -> i64 {
+        self.parse::<i64>().unwrap()
     }
 
     fn to_pair(&self) -> (i32, i32) {
