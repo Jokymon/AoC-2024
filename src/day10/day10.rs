@@ -22,7 +22,7 @@ mod tests {
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT), 81);
     }
 }
 
@@ -109,8 +109,34 @@ fn challenge1(challenge_input: &str) -> i32 {
     total_score
 }
 
-fn challenge2(_challenge_input: &str) -> i32 {
-    42
+fn challenge2(challenge_input: &str) -> i32 {
+    let map_repr: Vec<_> = challenge_input.trim().lines().collect();
+    let mut explorers = get_explorers(&map_repr);
+    let mut total_score = 0;
+
+    while !explorers.is_empty() {
+        // We try to follow every explorer to a summit
+        let mut front = explorers.pop().unwrap();
+
+        let mut new_explorers = next_steps(&map_repr, &front);
+        while !new_explorers.is_empty() && front.height != 9 {
+            front = new_explorers.remove(0);
+
+            // If we reach a split, we create a new explorer and must follow one
+            // of the explorers to the summit
+            for explorer in new_explorers {
+                explorers.push(explorer);
+            }
+            new_explorers = next_steps(&map_repr, &front);
+        }
+
+        // Once we actually reach the top, we check if we already reached this
+        // same summit from same trailhead
+        if front.height == 9 {
+            total_score += 1;
+        }
+    }
+    total_score
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
