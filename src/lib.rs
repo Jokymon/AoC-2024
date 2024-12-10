@@ -31,6 +31,16 @@ pub fn get_arg1() -> Option<String> {
     args.get(1).cloned()
 }
 
+pub trait SimpleChar {
+    fn as_i32(&self) -> i32;
+}
+
+impl SimpleChar for char {
+    fn as_i32(&self) -> i32 {
+        (*self as i32) - ('0' as i32)
+    }
+}
+
 pub trait SimpleParse {
     fn get_i32(&self) -> i32;
     fn get_i64(&self) -> i64;
