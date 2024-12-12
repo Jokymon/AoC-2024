@@ -1,6 +1,6 @@
+use aoc2024::{Field, Location};
 use std::error::Error;
 use std::fs::read_to_string;
-use std::ops::Deref;
 
 #[cfg(test)]
 mod tests {
@@ -38,12 +38,6 @@ MMMISSJEEE"#;
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]
-pub struct Position {
-    row: i32,
-    column: i32,
-}
-
 #[derive(PartialEq, Clone, Copy, Debug)]
 struct Plot {
     plant_type: char,
@@ -56,92 +50,49 @@ struct Region {
     area: usize,
 }
 
-#[derive(Debug)]
-struct Garden(Vec<Vec<Plot>>);
+type Garden = Field<Plot>;
 
-impl Garden {
-    fn plot_at(&self, x: i32, y: i32) -> Option<Plot> {
-        if (y < 0) || (y as usize >= self.len()) {
-            return None;
-        }
-        if (x < 0) || (x as usize >= self[y as usize].len()) {
-            return None;
-        }
-        Some(self[y as usize][x as usize])
-    }
-}
-
-impl Deref for Garden {
-    type Target = Vec<Vec<Plot>>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-fn collect_region(garden: &mut Garden, regions: &mut Vec<Region>, position: &Position) {
-    let mut visited_positions: Vec<Position> = vec![];
-    let mut search_front: Vec<Position> = vec![*position];
-    // visited_positions.push(*position);
+fn collect_region(garden: &mut Garden, regions: &mut Vec<Region>, position: &Location) {
+    let mut visited_positions: Vec<Location> = vec![];
+    let mut search_front: Vec<Location> = vec![*position];
 
     let mut new_region = Region { area: 0, fences: 1 };
-    let plant_type = garden
-        .plot_at(position.column, position.row)
-        .unwrap()
-        .plant_type;
-    // println!(
-    //     "\nFilling a region from {:?} with type {}",
-    //     position, plant_type
-    // );
+    let plant_type = garden.at(&position).unwrap().plant_type;
 
     while !search_front.is_empty() {
         let position = search_front.pop().unwrap();
 
         new_region.area += 1;
         visited_positions.push(position);
-        garden.0[position.row as usize][position.column as usize].assigned = true;
+        garden.at_mut(&position).unwrap().assigned = true;
 
-        for (dx, dy) in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
-            let neighbor_position = Position {
-                row: position.row + dy,
-                column: position.column + dx,
-            };
-            if visited_positions.contains(&neighbor_position)
-                || search_front.contains(&&neighbor_position)
-            {
+        for (location, neighbor) in garden.actual_neighbors(&position) {
+            if visited_positions.contains(&location) || search_front.contains(&location) {
                 // !! if the neighbor is already in the search front, we can also skip it
-                // println!("  skipping position {:?} - already have that", neighbor_position);
                 continue;
             }
 
-            if let Some(neighbor) = garden.plot_at(neighbor_position.column, neighbor_position.row)
-            {
-                if neighbor.assigned {
-                    // println!("  skipping position {:?} - already assigned to a different region", neighbor_position);
-                    continue;
-                }
+            if neighbor.assigned {
+                // This neighbor already belongs to a region
+                continue;
+            }
 
-                if neighbor.plant_type == plant_type {
-                    search_front.push(neighbor_position);
-                }
+            if neighbor.plant_type == plant_type {
+                search_front.push(location);
             }
         }
     }
 
-    // println!(
-    //     "Identified region {} with positions {:?}",
-    //     plant_type, visited_positions
-    // );
     // Go through all the plots of the previousy collected region
     new_region.fences = visited_positions
         .iter()
         .map(|position| {
             // Go through all the neighbors of one region and find those neighbors, that have
             // a different plant type or aren't even on the map
-            [(-1, 0), (1, 0), (0, -1), (0, 1)]
-                .iter()
-                .filter(|(dx, dy)| {
-                    if let Some(plot) = garden.plot_at(position.column + dx, position.row + dy) {
+            garden
+                .all_neighbors(position)
+                .filter(|(_location, maybe_plot)| {
+                    if let Some(plot) = maybe_plot {
                         plot.plant_type != plant_type
                     } else {
                         true
@@ -150,16 +101,12 @@ fn collect_region(garden: &mut Garden, regions: &mut Vec<Region>, position: &Pos
                 .count()
         })
         .sum();
-    // println!(
-    //     "  Region {}: {} fences, {} area",
-    //     plant_type, new_region.fences, new_region.area
-    // );
 
     regions.push(new_region);
 }
 
 fn challenge1(challenge_input: &str) -> i64 {
-    let mut garden: Garden = Garden(
+    let mut garden: Garden = Field::new(
         challenge_input
             .trim()
             .lines()
@@ -173,19 +120,21 @@ fn challenge1(challenge_input: &str) -> i64 {
             })
             .collect(),
     );
-    // println!("{:?}", garden);
 
     let mut regions: Vec<Region> = vec![];
     for (line_no, line) in garden.clone().iter().enumerate() {
         for (pos, _plot) in line.iter().enumerate() {
             // We are not using the plot from iterating the garden because this is just
             // an unmodified clone of the garden
-            if let Some(plot) = garden.plot_at(pos as i32, line_no as i32) {
+            if let Some(plot) = garden.at(&Location {
+                column: pos as i32,
+                row: line_no as i32,
+            }) {
                 if !plot.assigned {
                     collect_region(
                         &mut garden,
                         &mut regions,
-                        &Position {
+                        &Location {
                             row: line_no as i32,
                             column: pos as i32,
                         },

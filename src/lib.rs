@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use std::error::Error;
+use std::ops::Deref;
 use std::{env, fmt};
 
 #[derive(Debug, Clone)]
@@ -64,6 +65,118 @@ impl SimpleParse for str {
             .unwrap()
     }
 }
+
+// ------------------------------------------------------------------
+// Code for handling 2-dimensional structures of type
+
+#[derive(PartialEq, Clone, Copy)]
+pub struct Location {
+    pub column: i32,
+    pub row: i32,
+}
+
+pub struct Field<T>(Vec<Vec<T>>);
+
+impl<T> Field<T> {
+    pub fn new(v: Vec<Vec<T>>) -> Field<T> {
+        Field(v)
+    }
+
+    pub fn at(&self, location: &Location) -> Option<T>
+    where
+        T: Copy,
+    {
+        if (location.row < 0) || (location.row as usize >= self.0.len()) {
+            return None;
+        }
+        if (location.column < 0)
+            || (location.column as usize >= self.0[location.row as usize].len())
+        {
+            return None;
+        }
+        Some(self.0[location.row as usize][location.column as usize])
+    }
+
+    pub fn at_mut(&mut self, location: &Location) -> Option<&mut T>
+    where
+        T: Copy,
+    {
+        if location.row >= 0 && (location.row as usize) < self.0.len() {
+            if let Some(row) = self.0.get_mut(location.row as usize) {
+                return row.get_mut(location.column as usize);
+            }
+        }
+        None
+    }
+
+    /// Iterate through actually available neighbors.
+    ///
+    /// Returns an iterator that will return a tuple for each vertical and horizontal neighbor
+    /// that is actually on the field, neighbors outside the field are ignored.
+    /// The returned tuple contains the location of the neighbor and the value of that neighbor.
+    ///
+    /// To iterate over all neighbors, including those outside of the Field, use `all_neighbors()`.
+    pub fn actual_neighbors<'a>(
+        &'a self,
+        location: &'a Location,
+    ) -> impl Iterator<Item = (Location, T)> + 'a
+    where
+        T: Copy,
+    {
+        let neighbor_positions = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+
+        neighbor_positions.into_iter().filter_map(move |(dx, dy)| {
+            let nx = location.column + dx;
+            let ny = location.row + dy;
+            let neighbor_location = Location {
+                column: nx,
+                row: ny,
+            };
+
+            self.0.get(ny as usize).and_then(|row| {
+                row.get(nx as usize)
+                    .cloned()
+                    .map(|val| (neighbor_location, val))
+            })
+        })
+    }
+
+    pub fn all_neighbors<'a>(
+        &'a self,
+        location: &'a Location,
+    ) -> impl Iterator<Item = (Location, Option<T>)> + 'a
+    where
+        T: Copy,
+    {
+        let neighbor_positions = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+
+        neighbor_positions.into_iter().map(move |(dx, dy)| {
+            let nx = location.column + dx;
+            let ny = location.row + dy;
+            let neighbor_location = Location {
+                column: nx,
+                row: ny,
+            };
+
+            (
+                neighbor_location,
+                self.0
+                    .get(ny as usize)
+                    .and_then(|row| row.get(nx as usize).cloned()),
+            )
+        })
+    }
+}
+
+impl<T> Deref for Field<T> {
+    type Target = Vec<Vec<T>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+// ------------------------------------------------------------------
 
 pub trait CharacterField {
     fn char_at(&self, x: i32, y: i32) -> Option<char>;
