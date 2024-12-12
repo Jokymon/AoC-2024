@@ -25,13 +25,33 @@ the `./src` tree with the name `day12` and creates a new `[[bin]]`-entry in the 
 
 In this section I loosely collect my experiences, good, bad and key take aways from trying to solve AoC 2024 with Rust.
 
+### Rust
+
+Quick facts and teasers about Rust
+
+ * Rust is (mostly?) expression based
+   * `match` and `if` have a return type which must be identical for all branches
+   * The last line of a function can be an expression which, when no `;` is given, is equivalent to a `return` statement
+ * Supports `enum` which, other than for ex. in C++, is a sum-type or a union
+ * Variables are immutable unless declared `mut`
+ * Has no inheritance but uses the concept of traits that are then implemented for `struct`s
+ * Provides more control over whether something is copied or not using the concepts of borrows, move and explicit copy 
+   and clone
+ * Pattern matching and destructuring is supported in `match` statements and `if let` control flow
+ * Has no exceptions and only handles errors using `Result` and `Option`. For fatal errors you can always stop
+   the application completely using a `panic!()`
+
 ### Take aways
 
 Learnings for the future for further AoC participations or general Rust coding
 
  * use `.lines()` instead of `.split('\n')` because it more clearly describes the
    intent and also handles different types of line endings
- * yep, definitly i64 is likely a good choice for default numbers type in AoC ;-)
+ * yep, definitly `i64` is likely a good choice for default numbers type in AoC ;-)
+ * don't ignore empty lines in the input. The downloaded input can contain trailing newlines. Just `trim()` them
+   away. This simplifies handling of test input without the need for manual "cleanup"
+ * Make sure to consistently use x,y and row/columns; it's probably a good idea to create
+   a custom data type for positions in a 2d character map
 
 ### Cool, happy
 
@@ -62,3 +82,10 @@ Learnings for the future for further AoC participations or general Rust coding
    documentation for a `struct` that is returned and that would actually
    most importantly implement an `Iterator` trait.
  * Handling of strings is hard because of special UTF-8 handling
+
+### What is definitly missing
+
+This may not necessarily be bad but came up while comparing solutions with other languages.
+
+ * Lambdas always require explicit parameters and features like a `_` or `it` (Kotlin) are
+   not (yet) supported. [Rust RFC for implicit closure parameters](https://github.com/rust-lang/rfcs/issues/2554)
