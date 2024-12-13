@@ -46,6 +46,7 @@ pub trait SimpleParse {
     fn get_i32(&self) -> i32;
     fn get_i64(&self) -> i64;
     fn to_pair(&self) -> (i32, i32);
+    fn to_pair_i64(&self) -> (i64, i64);
 }
 
 impl SimpleParse for str {
@@ -64,17 +65,13 @@ impl SimpleParse for str {
             .collect_tuple()
             .unwrap()
     }
-}
 
-pub trait MathHelpers {
-    /// Round a float to a given amount of digits
-    fn round_digits(&self, digits: usize) -> f64;
-}
-
-impl MathHelpers for f64 {
-    fn round_digits(&self, digits: usize) -> f64 {
-        let factor = f64::powf(10.0, digits as f64);
-        (*self * factor).round() / factor
+    fn to_pair_i64(&self) -> (i64, i64) {
+        self.split_whitespace()
+            .take(2)
+            .map(|x| x.get_i64())
+            .collect_tuple()
+            .unwrap()
     }
 }
 
@@ -82,8 +79,8 @@ impl MathHelpers for f64 {
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub struct Position {
-    pub x: i32,
-    pub y: i32,
+    pub x: i64,
+    pub y: i64,
 }
 
 // ------------------------------------------------------------------

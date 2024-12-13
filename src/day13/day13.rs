@@ -1,4 +1,4 @@
-use aoc2024::{MathHelpers, Position, SimpleParse};
+use aoc2024::{Position, SimpleParse};
 use std::error::Error;
 use std::fs::read_to_string;
 
@@ -50,7 +50,7 @@ fn position_from_string(s: &str) -> Position {
         .replace("X=", "")
         .replace("Y=", "")
         .replace(",", "");
-    let pair = s.to_pair();
+    let pair = s.to_pair_i64();
     Position {
         x: pair.0,
         y: pair.1,
@@ -107,13 +107,28 @@ fn solve_claw_machine(clawmachine: &ClawMachine) -> Option<i64> {
     let righ_hand: f64 = clawmachine.prize.x as f64
         - clawmachine.prize.y as f64
             * (clawmachine.button_a.x as f64 / clawmachine.button_a.y as f64);
-    let moves_b = (righ_hand / divisor).round_digits(3);
+    let moves_b = (righ_hand / divisor).round();
     if moves_b - moves_b.floor() != 0.0 {
         return None;
     }
 
     let moves_a = (clawmachine.prize.x as f64 - moves_b * clawmachine.button_b.x as f64)
         / clawmachine.button_a.x as f64;
+
+    // Hmm, this feels like an ugly hack - we use round() on moves_b to make
+    // sure we only get integer solutions. We should already get integer
+    // solutions by checking for fractional parts that are very close to an
+    // integer. This works for the first part, but somehow fails for part 2.
+    if moves_a as i64 * clawmachine.button_a.x + moves_b as i64 * clawmachine.button_b.x
+        != clawmachine.prize.x
+    {
+        return None;
+    }
+    if moves_a as i64 * clawmachine.button_a.y + moves_b as i64 * clawmachine.button_b.y
+        != clawmachine.prize.y
+    {
+        return None;
+    }
 
     Some(moves_a as i64 * 3 + moves_b as i64 * 1)
 }
@@ -123,8 +138,22 @@ fn challenge1(challenge_input: &str) -> i64 {
     claw_machines.iter().map(solve_claw_machine).flatten().sum()
 }
 
-fn challenge2(_challenge_input: &str) -> i64 {
-    42
+fn challenge2(challenge_input: &str) -> i64 {
+    let claw_machines = parse_input(challenge_input);
+    claw_machines
+        .iter()
+        .map(|machine| {
+            solve_claw_machine(&ClawMachine {
+                button_a: machine.button_a,
+                button_b: machine.button_b,
+                prize: Position {
+                    x: machine.prize.x + 10000000000000,
+                    y: machine.prize.y + 10000000000000,
+                },
+            })
+        })
+        .flatten()
+        .sum()
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
