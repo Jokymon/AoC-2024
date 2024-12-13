@@ -66,6 +66,26 @@ impl SimpleParse for str {
     }
 }
 
+pub trait MathHelpers {
+    /// Round a float to a given amount of digits
+    fn round_digits(&self, digits: usize) -> f64;
+}
+
+impl MathHelpers for f64 {
+    fn round_digits(&self, digits: usize) -> f64 {
+        let factor = f64::powf(10.0, digits as f64);
+        (*self * factor).round() / factor
+    }
+}
+
+// ------------------------------------------------------------------
+
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
+pub struct Position {
+    pub x: i32,
+    pub y: i32,
+}
+
 // ------------------------------------------------------------------
 // Code for handling 2-dimensional structures of type
 
