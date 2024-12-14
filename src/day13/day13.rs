@@ -29,7 +29,7 @@ Prize: X=18641, Y=10279"#;
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT), 875318608908);
     }
 }
 
@@ -64,11 +64,7 @@ fn parse_input(input: &str) -> Vec<ClawMachine> {
     let mut button_b = Position { x: 0, y: 0 };
     let mut prize;
 
-    for line in input.lines() {
-        if line.trim().is_empty() {
-            continue;
-        }
-
+    for line in input.lines().filter(|line| !line.is_empty()) {
         let mut split = line.splitn(2, ":");
         match split.next() {
             Some("Button A") => {
