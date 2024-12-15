@@ -92,41 +92,29 @@ fn parse_input(input: &str) -> Vec<ClawMachine> {
 // function returns a `None` when there is no combination to win a prize.
 // When a prize can be won, the function returns the amount of needed tokens.
 fn solve_claw_machine(clawmachine: &ClawMachine) -> Option<i64> {
-    let det = clawmachine.button_a.x * clawmachine.button_b.y
+    let det_ab = clawmachine.button_a.x * clawmachine.button_b.y
         - clawmachine.button_a.y * clawmachine.button_b.x;
-    if det == 0 {
+    if det_ab == 0 {
         panic!("No clawmachines with Det 0 are currently expected");
     }
-    let divisor: f64 = clawmachine.button_b.x as f64
-        - (clawmachine.button_b.y as f64 * clawmachine.button_a.x as f64
-            / clawmachine.button_a.y as f64);
-    let righ_hand: f64 = clawmachine.prize.x as f64
-        - clawmachine.prize.y as f64
-            * (clawmachine.button_a.x as f64 / clawmachine.button_a.y as f64);
-    let moves_b = (righ_hand / divisor).round();
-    if moves_b - moves_b.floor() != 0.0 {
-        return None;
+
+    // Using Cramers rule to calculate the solution of the equation system
+    let det_ap =
+        clawmachine.button_a.x * clawmachine.prize.y - clawmachine.button_a.y * clawmachine.prize.x;
+    let det_pb =
+        clawmachine.prize.x * clawmachine.button_b.y - clawmachine.prize.y * clawmachine.button_b.x;
+
+    if det_ap % det_ab != 0 {
+        return None
+    }
+    if det_pb % det_ab != 0 {
+        return None
     }
 
-    let moves_a = (clawmachine.prize.x as f64 - moves_b * clawmachine.button_b.x as f64)
-        / clawmachine.button_a.x as f64;
+    let moves_a = det_pb / det_ab;
+    let moves_b = det_ap / det_ab;
 
-    // Hmm, this feels like an ugly hack - we use round() on moves_b to make
-    // sure we only get integer solutions. We should already get integer
-    // solutions by checking for fractional parts that are very close to an
-    // integer. This works for the first part, but somehow fails for part 2.
-    if moves_a as i64 * clawmachine.button_a.x + moves_b as i64 * clawmachine.button_b.x
-        != clawmachine.prize.x
-    {
-        return None;
-    }
-    if moves_a as i64 * clawmachine.button_a.y + moves_b as i64 * clawmachine.button_b.y
-        != clawmachine.prize.y
-    {
-        return None;
-    }
-
-    Some(moves_a as i64 * 3 + moves_b as i64 * 1)
+    Some(moves_a * 3 + moves_b * 1)
 }
 
 fn challenge1(challenge_input: &str) -> i64 {
