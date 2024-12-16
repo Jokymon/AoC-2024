@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use std::error::Error;
-use std::ops::Deref;
+use std::ops::{Add, Deref};
 use std::{env, fmt};
 
 #[derive(Debug, Clone)]
@@ -92,12 +92,24 @@ pub struct Location {
     pub row: i32,
 }
 
+// TODO: maybe we should use absolute directions like
+// east, west etc. for the Direction so that we can use
+// move-relative direction like forward, backward, left, right
+// for another type
 #[derive(Debug, Clone, Copy)]
 pub enum Direction {
     Left,
     Up,
     Right,
     Down,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum DirectionRelative {
+    Left,
+    Forward,
+    Right,
+    Reverse,
 }
 
 impl From<char> for Direction {
@@ -108,6 +120,34 @@ impl From<char> for Direction {
             '>' => Direction::Right,
             'v' => Direction::Down,
             _ => panic!("Illegal character for direction: {}", value),
+        }
+    }
+}
+
+impl Add<DirectionRelative> for Direction {
+    type Output=Direction;
+
+    fn add(self, rhs: DirectionRelative) -> Self::Output {
+        match rhs {
+            DirectionRelative::Forward => self,
+            DirectionRelative::Left => match self {
+                Direction::Up => Direction::Left,
+                Direction::Right => Direction::Up,
+                Direction::Down => Direction::Right,
+                Direction::Left => Direction::Down,
+            },
+            DirectionRelative::Right => match self {
+                Direction::Up => Direction::Right,
+                Direction::Right => Direction::Down,
+                Direction::Down => Direction::Left,
+                Direction::Left => Direction::Up,
+            },
+            DirectionRelative::Reverse => match self {
+                Direction::Up => Direction::Down,
+                Direction::Right => Direction::Left,
+                Direction::Down => Direction::Up,
+                Direction::Left => Direction::Right,
+            },
         }
     }
 }
