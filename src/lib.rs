@@ -86,12 +86,56 @@ pub struct Position {
 // ------------------------------------------------------------------
 // Code for handling 2-dimensional structures of type
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub struct Location {
     pub column: i32,
     pub row: i32,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum Direction {
+    Left,
+    Up,
+    Right,
+    Down,
+}
+
+impl From<char> for Direction {
+    fn from(value: char) -> Self {
+        match value {
+            '<' => Direction::Left,
+            '^' => Direction::Up,
+            '>' => Direction::Right,
+            'v' => Direction::Down,
+            _ => panic!("Illegal character for direction: {}", value),
+        }
+    }
+}
+
+impl Location {
+    pub fn in_direction(&self, direction: Direction) -> Location {
+        match direction {
+            Direction::Left => Location {
+                column: self.column - 1,
+                row: self.row,
+            },
+            Direction::Up => Location {
+                column: self.column,
+                row: self.row - 1,
+            },
+            Direction::Right => Location {
+                column: self.column + 1,
+                row: self.row,
+            },
+            Direction::Down => Location {
+                column: self.column,
+                row: self.row + 1,
+            },
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Field<T>(Vec<Vec<T>>);
 
 impl<T> Field<T> {
@@ -124,6 +168,35 @@ impl<T> Field<T> {
             }
         }
         None
+    }
+
+    /// Replace the entry at the given location with the new `value`.
+    /// The location must exist or the code will panic.
+    pub fn put(&mut self, location: &Location, value: T) {
+        self.0[location.row as usize][location.column as usize] = value;
+    }
+
+    /// Returns an iterator that returns all entries of this field as a
+    /// tuple consisting of the location and the actual value.
+    pub fn each_location<'a>(&'a self) -> impl Iterator<Item = (Location, T)> + 'a
+    where
+        T: Copy,
+    {
+        self.0
+            .iter()
+            .enumerate()
+            .map(|(row, line)| {
+                line.iter().enumerate().map(move |(column, entry)| {
+                    (
+                        Location {
+                            column: column as i32,
+                            row: row as i32,
+                        },
+                        *entry,
+                    )
+                })
+            })
+            .flatten()
     }
 
     /// Iterate through actually available neighbors.
