@@ -1,7 +1,7 @@
-use std::{error::Error, i32};
-use std::fs::read_to_string;
-
 use aoc2024::{Direction, DirectionRelative, Field, Location};
+use itertools::Itertools;
+use std::fs::read_to_string;
+use std::error::Error;
 
 #[cfg(test)]
 mod tests {
@@ -23,6 +23,24 @@ mod tests {
 #S..#.....#...#
 ###############"#;
 
+    const SIMPLE_INPUT2: &str = r#"#################
+#...#...#...#..E#
+#.#.#.#.#.#.#.#.#
+#.#.#.#...#...#.#
+#.#.#.#.###.#.#.#
+#...#.#.#.....#.#
+#.#.#.#.#.#####.#
+#.#...#.#.#.....#
+#.#.#####.#.###.#
+#.#.#.......#...#
+#.#.###.#####.###
+#.#.#...#.....#.#
+#.#.#.#####.###.#
+#.#.#.........#.#
+#.#.#.#########.#
+#S#.............#
+#################"#;
+
     #[test]
     fn test_simple_input_part1() {
         assert_eq!(challenge1(SIMPLE_INPUT), 7036);
@@ -30,7 +48,12 @@ mod tests {
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT), 45);
+    }
+
+    #[test]
+    fn test_simple_input_part2_with_second_maze() {
+        assert_eq!(challenge2(SIMPLE_INPUT2), 64);
     }
 }
 
@@ -85,19 +108,20 @@ struct Walker {
     direction: Direction,
     location: Location,
     accumulated_cost: i32,
+    walked_tiles: Vec<Location>,
 }
 
-/// Walk the maze from start to end and determine the cost
 fn walk_maze(
     maze: &mut Maze,
     start: &Location,
     end: &Location,
     initial_direction: Direction,
-) -> i64 {
+) -> Vec<Walker> {
     let mut fronts: Vec<Walker> = vec![Walker {
         direction: initial_direction,
         location: *start,
         accumulated_cost: 0,
+        walked_tiles: vec![*start],
     }];
     let mut finished_walkers: Vec<Walker> = vec![];
 
@@ -124,7 +148,10 @@ fn walk_maze(
                     Place::Wall => continue, // Nothing to gain in this direction, we're walking into a wall
                     Place::Walkable(place_cost) => {
                         let new_walker_cost = walker.accumulated_cost + cost;
-                        if place_cost < new_walker_cost {
+                        // We give the new walker some slack, because he might already be
+                        // correctly oriented for the next step, while the cost on the tile
+                        // might not already include the cost for turning
+                        if place_cost < new_walker_cost - 1000 {
                             // We can skip this walker, it's not gonna get to the target faster
                             continue;
                         }
@@ -132,6 +159,11 @@ fn walk_maze(
                             direction: walker.direction + relative_direction,
                             location: new_spot,
                             accumulated_cost: new_walker_cost,
+                            walked_tiles: {
+                                let mut new_tiles = walker.walked_tiles.clone();
+                                new_tiles.push(new_spot);
+                                new_tiles
+                            },
                         });
                         maze.put(&new_spot, Place::Walkable(new_walker_cost));
                     }
@@ -141,17 +173,56 @@ fn walk_maze(
         }
     }
 
-    finished_walkers.iter().map(|walker| walker.accumulated_cost).fold(i32::MAX, i32::min) as i64
+    finished_walkers
+}
+
+/// Walk the maze from start to end and determine the cost
+fn walk_maze_cost(
+    maze: &mut Maze,
+    start: &Location,
+    end: &Location,
+    initial_direction: Direction,
+) -> i64 {
+    let finished_walkers = walk_maze(maze, start, end, initial_direction);
+
+    finished_walkers
+        .iter()
+        .map(|walker| walker.accumulated_cost)
+        .fold(i32::MAX, i32::min) as i64
+}
+
+fn walk_best_spots(
+    maze: &mut Maze,
+    start: &Location,
+    end: &Location,
+    initial_direction: Direction,
+) -> i64 {
+    let finished_walkers = walk_maze(maze, start, end, initial_direction);
+
+    let minimum_cost = finished_walkers
+        .iter()
+        .map(|walker| walker.accumulated_cost)
+        .fold(i32::MAX, i32::min);
+
+    finished_walkers
+        .iter()
+        .filter(|walker: &&Walker| walker.accumulated_cost == minimum_cost)
+        .map(|walker| walker.walked_tiles.clone())
+        .flatten()
+        .unique()
+        .count() as i64
 }
 
 fn challenge1(challenge_input: &str) -> i64 {
     let (mut maze, start, end) = parse_input(challenge_input);
 
-    walk_maze(&mut maze, &start, &end, Direction::Right)
+    walk_maze_cost(&mut maze, &start, &end, Direction::Right)
 }
 
-fn challenge2(_challenge_input: &str) -> i64 {
-    42
+fn challenge2(challenge_input: &str) -> i64 {
+    let (mut maze, start, end) = parse_input(challenge_input);
+
+    walk_best_spots(&mut maze, &start, &end, Direction::Right)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {

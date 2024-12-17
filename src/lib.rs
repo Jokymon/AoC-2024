@@ -86,7 +86,7 @@ pub struct Position {
 // ------------------------------------------------------------------
 // Code for handling 2-dimensional structures of type
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub struct Location {
     pub column: i32,
     pub row: i32,
