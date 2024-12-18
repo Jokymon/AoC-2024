@@ -39,7 +39,7 @@ mod tests {
 
     #[test]
     fn test_simple_input_part2() {
-        assert_eq!(challenge2(SIMPLE_INPUT), 0);
+        assert_eq!(challenge2(SIMPLE_INPUT, 7, 12), "6,1");
     }
 }
 
@@ -108,7 +108,7 @@ fn challenge1(challenge_input: &str, gridsize: i32, fallen_bytes: i64) -> i64 {
 
     if let Some(target_location) = memory_space.at(&Location{column: gridsize-1, row: gridsize-1}) {
         match target_location {
-            MemoryLocation::Corruption => panic!("Target location should be corrupted"),
+            MemoryLocation::Corruption => panic!("Target location should not be corrupted"),
             MemoryLocation::Free(cost) => cost as i64,
         }
     } else {
@@ -116,15 +116,27 @@ fn challenge1(challenge_input: &str, gridsize: i32, fallen_bytes: i64) -> i64 {
     }
 }
 
-fn challenge2(_challenge_input: &str) -> i64 {
-    42
+fn challenge2(challenge_input: &str, gridsize: i32, fallen_bytes_offset: i64) -> String {
+    let falling_bytes_locations = parse_input(challenge_input);
+
+    // WOW, this is a really ugly hack and should be refactored into some nice find/fold
+    // something structure :-(
+    let mut fallen_byte_index = fallen_bytes_offset as usize;
+    let mut cost = challenge1(challenge_input, gridsize, fallen_byte_index as i64);
+    while cost < i32::MAX as i64 {
+        fallen_byte_index += 1;
+        cost = challenge1(challenge_input, gridsize, fallen_byte_index as i64);
+    }
+
+    let blocking_location = falling_bytes_locations[fallen_byte_index-1];
+    format!("{},{}", blocking_location.column, blocking_location.row)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let test_input = read_to_string("input_data/day18/input.txt")?;
 
     let result1 = challenge1(&test_input, 71, 1024);
-    let result2 = challenge2(&test_input);
+    let result2 = challenge2(&test_input, 71, 1024);
 
     println!("Answer part 1: {}", result1);
     println!("Answer part 2: {}", result2);
