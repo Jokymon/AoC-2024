@@ -173,6 +173,23 @@ impl Location {
             },
         }
     }
+
+    pub fn neighbors<'a>(
+        &'a self,
+    ) -> impl Iterator<Item = Location> + 'a
+    where
+    {
+        let neighbor_positions = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+
+        neighbor_positions.into_iter().map(move |(dx, dy)| {
+            let nx = self.column + dx;
+            let ny = self.row + dy;
+            Location {
+                column: nx,
+                row: ny,
+            }
+        })
+    }
 }
 
 #[derive(Debug)]

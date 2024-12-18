@@ -70,6 +70,10 @@ path = "src/day16/day16.rs"
 name = "day17"
 path = "src/day17/day17.rs"
 
+[[bin]]
+name = "day18"
+path = "src/day18/day18.rs"
+
 [dependencies]
 count-digits = "0.5.1"
 itertools = "0.13.0"
