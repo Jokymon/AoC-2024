@@ -97,22 +97,22 @@ fn quadrant(position: &Position, width: i64, height: i64) -> Option<usize> {
 
     if position.x < middle_x {
         if position.y < middle_y {
-            return Some(0);
+            Some(0)
         } else if position.y > middle_y {
-            return Some(2);
+            Some(2)
         } else {
-            return None;
+            None
         }
     } else if position.x > middle_x {
         if position.y < middle_y {
-            return Some(1);
+            Some(1)
         } else if position.y > middle_y {
-            return Some(3);
+            Some(3)
         } else {
-            return None;
+            None
         }
     } else {
-        return None;
+        None
     }
 }
 

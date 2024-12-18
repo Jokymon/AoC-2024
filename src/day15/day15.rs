@@ -104,13 +104,13 @@ fn move_box(warehouse: &mut Warehouse, location: &Location, direction: Direction
             // the boxes in the move direction away. So now we must move this box
             warehouse.put(&location, Place::Floor);
             warehouse.put(&target, Place::Box);
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     } else {
         // There are no more places left in this movement direction, so don't move
-        return false;
+        false
     }
 }
 
