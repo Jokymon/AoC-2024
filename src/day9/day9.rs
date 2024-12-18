@@ -74,7 +74,7 @@ fn challenge1(challenge_input: &str) -> i64 {
         .sum()
 }
 
-fn challenge2(challenge_input: &str) -> i32 {
+fn challenge2(_challenge_input: &str) -> i32 {
     42
 }
 
