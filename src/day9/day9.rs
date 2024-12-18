@@ -36,14 +36,13 @@ fn challenge1(challenge_input: &str) -> i64 {
         .trim()
         .chars()
         .enumerate()
-        .map(|(block_index, block_size)| {
+        .flat_map(|(block_index, block_size)| {
             if block_index % 2 == 0 {
                 vec![(block_index / 2) as i32; block_size.as_num()]
             } else {
                 vec![-1; block_size.as_num()]
             }
         })
-        .flatten()
         .collect();
 
     let mut to_index: usize = 0;

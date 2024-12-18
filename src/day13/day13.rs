@@ -105,10 +105,10 @@ fn solve_claw_machine(clawmachine: &ClawMachine) -> Option<i64> {
         clawmachine.prize.x * clawmachine.button_b.y - clawmachine.prize.y * clawmachine.button_b.x;
 
     if det_ap % det_ab != 0 {
-        return None
+        return None;
     }
     if det_pb % det_ab != 0 {
-        return None
+        return None;
     }
 
     let moves_a = det_pb / det_ab;
@@ -119,14 +119,14 @@ fn solve_claw_machine(clawmachine: &ClawMachine) -> Option<i64> {
 
 fn challenge1(challenge_input: &str) -> i64 {
     let claw_machines = parse_input(challenge_input);
-    claw_machines.iter().map(solve_claw_machine).flatten().sum()
+    claw_machines.iter().flat_map(solve_claw_machine).sum()
 }
 
 fn challenge2(challenge_input: &str) -> i64 {
     let claw_machines = parse_input(challenge_input);
     claw_machines
         .iter()
-        .map(|machine| {
+        .flat_map(|machine| {
             solve_claw_machine(&ClawMachine {
                 button_a: machine.button_a,
                 button_b: machine.button_b,
@@ -136,7 +136,6 @@ fn challenge2(challenge_input: &str) -> i64 {
                 },
             })
         })
-        .flatten()
         .sum()
 }
 

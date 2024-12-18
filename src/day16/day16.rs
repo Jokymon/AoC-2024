@@ -1,7 +1,7 @@
 use aoc2024::{Direction, DirectionRelative, Field, Location};
 use itertools::Itertools;
-use std::fs::read_to_string;
 use std::error::Error;
+use std::fs::read_to_string;
 
 #[cfg(test)]
 mod tests {
@@ -207,8 +207,7 @@ fn walk_best_spots(
     finished_walkers
         .iter()
         .filter(|walker: &&Walker| walker.accumulated_cost == minimum_cost)
-        .map(|walker| walker.walked_tiles.clone())
-        .flatten()
+        .flat_map(|walker| walker.walked_tiles.clone())
         .unique()
         .count() as i64
 }

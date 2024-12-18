@@ -125,7 +125,7 @@ impl From<char> for Direction {
 }
 
 impl Add<DirectionRelative> for Direction {
-    type Output=Direction;
+    type Output = Direction;
 
     fn add(self, rhs: DirectionRelative) -> Self::Output {
         match rhs {
@@ -174,11 +174,8 @@ impl Location {
         }
     }
 
-    pub fn neighbors(
-        &self,
-    ) -> impl Iterator<Item = Location> + '_
-    where
-    {
+    pub fn neighbors(&self) -> impl Iterator<Item = Location> + '_
+where {
         let neighbor_positions = [(-1, 0), (1, 0), (0, -1), (0, 1)];
 
         neighbor_positions.into_iter().map(move |(dx, dy)| {
@@ -239,21 +236,17 @@ impl<T> Field<T> {
     where
         T: Copy,
     {
-        self.0
-            .iter()
-            .enumerate()
-            .map(|(row, line)| {
-                line.iter().enumerate().map(move |(column, entry)| {
-                    (
-                        Location {
-                            column: column as i32,
-                            row: row as i32,
-                        },
-                        *entry,
-                    )
-                })
+        self.0.iter().enumerate().flat_map(|(row, line)| {
+            line.iter().enumerate().map(move |(column, entry)| {
+                (
+                    Location {
+                        column: column as i32,
+                        row: row as i32,
+                    },
+                    *entry,
+                )
             })
-            .flatten()
+        })
     }
 
     /// Iterate through actually available neighbors.
