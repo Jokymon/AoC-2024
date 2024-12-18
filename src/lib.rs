@@ -174,9 +174,9 @@ impl Location {
         }
     }
 
-    pub fn neighbors<'a>(
-        &'a self,
-    ) -> impl Iterator<Item = Location> + 'a
+    pub fn neighbors(
+        &self,
+    ) -> impl Iterator<Item = Location> + '_
     where
     {
         let neighbor_positions = [(-1, 0), (1, 0), (0, -1), (0, 1)];
@@ -235,7 +235,7 @@ impl<T> Field<T> {
 
     /// Returns an iterator that returns all entries of this field as a
     /// tuple consisting of the location and the actual value.
-    pub fn each_location<'a>(&'a self) -> impl Iterator<Item = (Location, T)> + 'a
+    pub fn each_location(&self) -> impl Iterator<Item = (Location, T)> + '_
     where
         T: Copy,
     {
