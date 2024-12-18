@@ -104,7 +104,7 @@ fn challenge1(challenge_input: &str) -> i32 {
         });
     });
 
-    antinodes.iter().count() as i32
+    antinodes.len() as i32
 }
 
 fn challenge2(challenge_input: &str) -> i32 {
@@ -165,7 +165,7 @@ fn challenge2(challenge_input: &str) -> i32 {
         });
     });
 
-    antinodes.iter().count() as i32
+    antinodes.len() as i32
 }
 
 fn main() -> Result<(), Box<dyn Error>> {

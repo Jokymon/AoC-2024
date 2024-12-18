@@ -59,7 +59,7 @@ fn blink_n_times(challenge_input: &str, blinks: i32) -> i64 {
             })
             .collect();
     }
-    stones.iter().count() as i64
+    stones.len() as i64
 }
 
 // I have to admit, I first tried just running the "functional" approach for part 1 again on
