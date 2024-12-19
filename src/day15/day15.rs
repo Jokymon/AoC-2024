@@ -121,22 +121,21 @@ fn challenge1(challenge_input: &str) -> i64 {
 
         let target = robot_position.in_direction(movement);
         if let Some(place) = warehouse.at(&target) {
-            if place == Place::Floor {
+            if place == Place::Floor
+                || (place == Place::Box && move_box(&mut warehouse, &target, movement))
+            {
                 robot_position = target;
-            } else if place == Place::Box {
-                if move_box(&mut warehouse, &target, movement) {
-                    robot_position = target;
-                }
             }
         }
     }
 
-    warehouse.each_location().map(|(location, place)| {
-        match place {
+    warehouse
+        .each_location()
+        .map(|(location, place)| match place {
             Place::Box => (100 * location.row + location.column) as i64,
-            _ => 0
-        }
-    }).sum()
+            _ => 0,
+        })
+        .sum()
 }
 
 fn challenge2(_challenge_input: &str) -> i64 {

@@ -90,16 +90,14 @@ fn challenge1(challenge_input: &str) -> i32 {
 
             let distance_vector = **position2 - **position1;
             let antinode1 = **position1 - distance_vector;
-            if antenna_map.has_position(antinode1.x, antinode1.y) {
-                if !antinodes.contains(&antinode1) {
-                    antinodes.push(antinode1);
-                }
+            if antenna_map.has_position(antinode1.x, antinode1.y) && !antinodes.contains(&antinode1)
+            {
+                antinodes.push(antinode1);
             }
             let antinode2 = **position2 + distance_vector;
-            if antenna_map.has_position(antinode2.x, antinode2.y) {
-                if !antinodes.contains(&antinode2) {
-                    antinodes.push(antinode2);
-                }
+            if antenna_map.has_position(antinode2.x, antinode2.y) && !antinodes.contains(&antinode2)
+            {
+                antinodes.push(antinode2);
             }
         });
     });
