@@ -138,7 +138,7 @@ fn challenge2(challenge_input: &str) -> i32 {
             if !antinodes.contains(position1) {
                 antinodes.push(**position1);
             }
-            if !antinodes.contains(&position2) {
+            if !antinodes.contains(position2) {
                 antinodes.push(**position2);
             }
 

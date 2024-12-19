@@ -66,7 +66,7 @@ fn parse_robots(input: &str) -> Vec<Robot> {
     robots
 }
 
-fn plot_robots(robots: &Vec<Robot>, width: i64, height: i64) -> String {
+fn plot_robots(robots: &[Robot], width: i64, height: i64) -> String {
     let positions: Vec<_> = robots.iter().map(|robot| robot.position).collect();
     let mut output = "".to_string();
 
@@ -128,7 +128,7 @@ fn challenge1(challenge_input: &str, width: i32, height: i32) -> i64 {
         }
     }
 
-    let mut robots_per_quadrant = vec![0; 4];
+    let mut robots_per_quadrant = [0; 4];
     for robot in robots.iter() {
         if let Some(quadrant) = quadrant(&robot.position, width as i64, height as i64) {
             robots_per_quadrant[quadrant] += 1;

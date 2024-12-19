@@ -171,7 +171,7 @@ fn challenge2(challenge_input: &str) -> i32 {
     for x in 0..char_field[0].len() as i32 {
         for y in 0..char_field.len() as i32 {
             if char_field.char_at(x, y).unwrap_or('.') == 'A' {
-                let corners: Vec<char> = vec![(-1, -1), (1, 1), (-1, 1), (1, -1)]
+                let corners: Vec<char> = [(-1, -1), (1, 1), (-1, 1), (1, -1)]
                     .iter()
                     .map(|(dx, dy)| char_field.char_at(x + dx, y + dy).unwrap_or('.'))
                     .collect();

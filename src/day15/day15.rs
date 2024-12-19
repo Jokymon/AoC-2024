@@ -102,7 +102,7 @@ fn move_box(warehouse: &mut Warehouse, location: &Location, direction: Direction
         {
             // The target for the box is either an empty spot on the floor or we could move
             // the boxes in the move direction away. So now we must move this box
-            warehouse.put(&location, Place::Floor);
+            warehouse.put(location, Place::Floor);
             warehouse.put(&target, Place::Box);
             true
         } else {

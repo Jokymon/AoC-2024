@@ -85,7 +85,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .truncate(true)
         .open("Cargo.toml")?;
 
-    file.write_all(&main_table.to_string().as_bytes())?;
+    file.write_all(main_table.to_string().as_bytes())?;
 
     Ok(())
 }

@@ -57,7 +57,7 @@ fn collect_region(garden: &mut Garden, regions: &mut Vec<Region>, position: &Loc
     let mut search_front: Vec<Location> = vec![*position];
 
     let mut new_region = Region { area: 0, fences: 1 };
-    let plant_type = garden.at(&position).unwrap().plant_type;
+    let plant_type = garden.at(position).unwrap().plant_type;
 
     while !search_front.is_empty() {
         let position = search_front.pop().unwrap();

@@ -63,7 +63,7 @@ mod tests {
     }
 }
 
-fn update_satisfies_rules(update: &Vec<i32>, rules: &Vec<(i32, i32)>) -> bool {
+fn update_satisfies_rules(update: &[i32], rules: &[(i32, i32)]) -> bool {
     for first_index in 0..update.len() {
         for second_index in first_index + 1..update.len() {
             // If the reversed order of the numbers is member of the rules,
@@ -122,7 +122,7 @@ fn challenge1(challenge_input: &str) -> i32 {
     let sum = input
         .updates
         .iter()
-        .filter(|update| update_satisfies_rules(&update, &input.rules))
+        .filter(|update| update_satisfies_rules(update, &input.rules))
         .map(|update| update.get(update.len() / 2).unwrap())
         .sum();
 
@@ -133,7 +133,7 @@ fn challenge2(challenge_input: &str) -> i32 {
     let input = parse_input(challenge_input);
 
     let sum = input.updates.iter().fold(0, |accu, page_update| {
-        if !update_satisfies_rules(&page_update, &input.rules) {
+        if !update_satisfies_rules(page_update, &input.rules) {
             let mut fixed_update = page_update.clone();
 
             fixed_update.sort_by(|&x, &y| {
