@@ -45,6 +45,7 @@ Quick facts and teasers about Rust
 
 Learnings for the future for further AoC participations or general Rust coding
 
+ * Use `cargo clippy` to learn a lot of good practices
  * use `.lines()` instead of `.split('\n')` because it more clearly describes the
    intent and also handles different types of line endings
  * yep, definitly `i64` is likely a good choice for default numbers type in AoC ;-)
@@ -52,6 +53,9 @@ Learnings for the future for further AoC participations or general Rust coding
    away. This simplifies handling of test input without the need for manual "cleanup"
  * Make sure to consistently use x,y and row/columns; it's probably a good idea to create
    a custom data type for positions in a 2d character map
+ * There actually is a `while let` similar to `if let`.
+ * Using an `.inspect(|item| println!("Item: {:?}", item))` in an iterator is a nice
+   way of debugging iterators
 
 ### Cool, happy
 
