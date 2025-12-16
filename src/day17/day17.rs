@@ -61,8 +61,9 @@ fn mnemonic(opcode: i32) -> String {
         OUT => "OUT",
         BDV => "BDV",
         CDV => "CDV",
-        _ => "ILGL!"
-    }.to_string()
+        _ => "ILGL!",
+    }
+    .to_string()
 }
 
 impl Computer {
@@ -95,15 +96,15 @@ impl Computer {
             self.instruction_pointer += 1;
 
             match opcode {
-                ADV => self.register_a = self.register_a / i32::pow(2, self.combo(operand) as u32),
-                BXL => self.register_b = self.register_b ^ operand,
+                ADV => self.register_a >>= self.combo(operand) as u32,
+                BXL => self.register_b ^= operand,
                 BST => self.register_b = self.combo(operand) % 8,
                 JNZ => {
                     if self.register_a != 0 {
                         self.instruction_pointer = operand / 2 // our instructions are index together with the operands
                     }
                 }
-                BXC => self.register_b = self.register_b ^ self.register_c,
+                BXC => self.register_b ^= self.register_c,
                 OUT => outputs.push(self.combo(operand) % 8),
                 BDV => self.register_b = self.register_a / i32::pow(2, self.combo(operand) as u32),
                 CDV => self.register_c = self.register_a / i32::pow(2, self.combo(operand) as u32),
@@ -142,10 +143,11 @@ fn parse_input(challenge_input: &str) -> Computer {
     let program_iter = program_code
         .trim()
         .split(",")
-        .map(|entry| SimpleParse::get_i32(entry));
+        .map(SimpleParse::get_i32);
 
     computer.program = program_iter
-        .clone().step_by(2)
+        .clone()
+        .step_by(2)
         .zip(program_iter.skip(1).step_by(2))
         .map(|(opcode, operand)| Instruction { opcode, operand })
         .collect();
